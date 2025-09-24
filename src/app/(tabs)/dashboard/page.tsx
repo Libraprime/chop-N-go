@@ -57,30 +57,35 @@ const handleFavorite = async (mealId: string) => {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        alert('You must be logged in to favorite a meal.');
-        return;
+      alert('You must be logged in to favorite a meal.');
+      return;
     }
 
     try {
-        const { error } = await supabase
-            .from('favorites')
-            .insert([
-                { user_id: user.id, meal_id: mealId }
-            ]);
+      const { error } = await supabase
+          .from('favorites')
+          .insert([
+              { user_id: user.id, meal_id: mealId }
+          ]);
 
-        if (error) {
-            if (error.code === '23505') { // This is the unique constraint error code
-                alert('This meal is already in your favorites!');
-            } else {
-                throw new Error(error.message);
-            }
+      if (error) {
+          if (error.code === '23505') { // This is the unique constraint error code
+              alert('This meal is already in your favorites!');
+          } else {
+              throw new Error(error.message);
+          }
         } else {
-            alert('Meal added to favorites!');
+          alert('Meal added to favorites!');
         }
-    } catch (err: any) {
-        console.error('Error adding to favorites:', err.message);
-        alert('Failed to add meal to favorites. Please try again.');
-    }
+
+  } catch (err: unknown) {
+      if (err instanceof Error) {
+          console.error('Error adding to favorites:', err.message);
+      } else {
+          console.error('Error adding to favorites:', err);
+      }
+      alert('Failed to add meal to favorites. Please try again.');
+  }
 };
 
 const Dashboard = () => {

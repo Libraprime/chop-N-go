@@ -7,14 +7,9 @@ import { createClient } from '@/utils/supabase/client';
 import logo from '@/public/logo.png';
 import { useCart } from '@/src/app/context/CartContext'; // Import the useCart hook
 
-interface HeaderProps {
-  // It's a good practice to define props for data that
-  // might be passed from a parent component.
-  // We'll keep the logic here for now, but this is a good
-  // next step for a larger application.
-}
 
-export default function Header({}: HeaderProps) {
+
+export default function Header() {
   const supabase = createClient();
   const [username, setUsername] = useState<string | null>(null);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
