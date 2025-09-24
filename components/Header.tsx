@@ -187,7 +187,9 @@ export default function Header({}: HeaderProps) {
           </div>
         </div>
 
-        <Link href='/favorites' className='text-3xl font-bold p-5 mx-5 mask mask-heart bg-base-100'></Link>
+        <div className='mt-2 md:p-0 text-xs align-middle p-5 text-white mask mask-heart bg-[#F36B2F]'>
+          <Link href='/favorites'>Favorites</Link>
+        </div>
       </div>
       
     </header>
