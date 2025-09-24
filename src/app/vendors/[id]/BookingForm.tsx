@@ -22,10 +22,10 @@ export default function BookingForm({ vendorId }: BookingFormProps) {
 
   // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
+  const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
-      [name]: value
+      [name]: name === 'guests' ? Number(value) : value,
     }));
   };
 
@@ -48,7 +48,7 @@ export default function BookingForm({ vendorId }: BookingFormProps) {
       });
 
       // Insert the new booking into the 'bookings' table
-      const { data, error } = await vendorsSupabaseClient
+      const { error } = await vendorsSupabaseClient
         .from('bookings')
         .insert({
           vendor_id: vendorId,
@@ -77,8 +77,12 @@ export default function BookingForm({ vendorId }: BookingFormProps) {
         guests: 1,
         notes: ''
       });
-    } catch (error: any) {
-      console.error('Error submitting booking:', error.message || error);
+    } catch (error: unknown) {
+      if (typeof error === 'object' && error !== null && 'message' in error) {
+        console.error('Error submitting booking:', (error as { message: string }).message);
+      } else {
+        console.error('Error submitting booking:', error);
+      }
       setMessage('There was an error submitting your booking. Please try again.');
     } finally {
       setLoading(false);

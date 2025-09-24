@@ -1,6 +1,5 @@
 'use client';
 
-import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Header from '@/components/Header';
@@ -11,7 +10,7 @@ import { useCart } from '@/src/app/context/CartContext'; // Correctly import the
 export default function CartPage() {
   const router = useRouter();
   // Use the useCart hook to get the cart data and functions
-  const { cart, removeFromCart, subtotal, addToCart } = useCart();
+  const { cart, removeFromCart, subtotal} = useCart();
   const deliveryFee = 500; // Mock delivery fee
   const total = subtotal + deliveryFee;
 

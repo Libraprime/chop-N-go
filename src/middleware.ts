@@ -12,9 +12,7 @@ export async function middleware(request: NextRequest) {
   });
 
   // Refresh the session and extract the session object with type annotation
-  const {
-    data: { session },
-  }: { data: { session: any } } = await supabase.auth.getSession();
+ const { data: { session } } = await supabase.auth.getSession();
 
   console.log("Session:", session);
 

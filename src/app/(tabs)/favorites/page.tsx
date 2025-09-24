@@ -5,7 +5,7 @@ import SpecialNav from '@/components/Navigation';
 import FavoriteList from './favorite-list';
 import { createClient } from '@/utils/supabase/server';
 import { vendorsSupabaseClient } from '@/utils/supabase/vendorsSupabaseClient';
-import { Meal, Vendor } from '@/types';
+import { Meal } from '@/types';
 
 export default async function FavoritesPage() {
     const supabase = await createClient();
