@@ -70,9 +70,9 @@ const handleFavorite = async (mealId: string) => {
 
       if (error) {
           if (error.code === '23505') { // This is the unique constraint error code
-              alert('This meal is already in your favorites!');
+            alert('This meal is already in your favorites!');
           } else {
-              throw new Error(error.message);
+            throw new Error(error.message);
           }
         } else {
           alert('Meal added to favorites!');
@@ -80,9 +80,9 @@ const handleFavorite = async (mealId: string) => {
 
   } catch (err: unknown) {
       if (err instanceof Error) {
-          console.error('Error adding to favorites:', err.message);
+        console.error('Error adding to favorites:', err.message);
       } else {
-          console.error('Error adding to favorites:', err);
+        console.error('Error adding to favorites:', err);
       }
       alert('Failed to add meal to favorites. Please try again.');
   }
@@ -187,11 +187,11 @@ const Dashboard = () => {
                   <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
                 </Link>
                 <button
-                    className="btn btn-square btn-ghost"
-                    aria-label="Add to favorites"
-                    onClick={() => handleFavorite(meal.id)} // <-- Added this onClick handler
+                  className="btn btn-square btn-ghost"
+                  aria-label="Add to favorites"
+                  onClick={() => handleFavorite(meal.id)} // <-- Added this onClick handler
                 >
-                    <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
+                  <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
                 </button>
               </li>
             );
