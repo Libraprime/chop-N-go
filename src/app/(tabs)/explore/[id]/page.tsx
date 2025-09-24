@@ -31,7 +31,13 @@ export interface Meal {
 }
 
 // This is a Server Component, so it can be async and fetch data directly
-export default async function OrderPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function OrderPage({ params }: PageProps) {
   const mealId = params.id;
 
   // Fetch the meal data from the 'meals' table and join with the 'vendors' table
