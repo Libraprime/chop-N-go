@@ -33,12 +33,12 @@ export default function Avatar({
 
         const objectUrl = URL.createObjectURL(data)
         setAvatarUrl(objectUrl)
-      } catch (error) {
-        const message =
-          (error as any)?.message ||
-          (error as any)?.error_description ||
-          JSON.stringify(error)
-
+      } catch (error: unknown) {
+      const message =
+        (error instanceof Error && error.message) ||
+        (typeof error === 'object' && error !== null && 'error_description' in error && error.error_description) ||
+        JSON.stringify(error)
+        
         console.error('Error downloading avatar:', message)
         onError?.(message)
       }
@@ -73,10 +73,10 @@ export default function Avatar({
       setAvatarUrl(objectUrl)
 
       onUpload(filePath)
-    } catch (error) {
+    } catch (error: unknown) {
       const message =
-        (error as any)?.message ||
-        (error as any)?.error_description ||
+        (error instanceof Error && error.message) ||
+        (typeof error === 'object' && error !== null && 'error_description' in error && error.error_description) ||
         JSON.stringify(error)
 
       console.error('Error uploading avatar:', message)

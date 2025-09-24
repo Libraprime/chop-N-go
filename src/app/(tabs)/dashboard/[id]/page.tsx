@@ -4,9 +4,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SpecialNav from '@/components/Navigation';
 import { notFound } from 'next/navigation';
-// Importing the server-side Supabase client
 import { vendorsSupabaseClient } from '@/utils/supabase/vendorsSupabaseClient';
-// Import the Client Component to handle interactivity
 import AddToCartSection from './AddToCart';
 
 // Define the structure of the vendor data from the 'vendors' table
@@ -33,24 +31,24 @@ export interface Meal {
 }
 
 // Reusable StarRating component with a unique group identifier
-const StarRating = ({ rating, groupId }: { rating: number; groupId: string }) => {
-  const roundedRating = Math.round(rating);
-  return (
-    <div className="rating rating-xs">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <input
-          key={star}
-          type="radio"
-          name={`rating-${groupId}`}
-          className="mask mask-star-2 bg-orange-400"
-          readOnly
-          checked={star <= roundedRating}
-          aria-label={`${star} star rating`}
-        />
-      ))}
-    </div>
-  );
-};
+// const StarRating = ({ rating, groupId }: { rating: number; groupId: string }) => {
+//   const roundedRating = Math.round(rating);
+//   return (
+//     <div className="rating rating-xs">
+//       {[1, 2, 3, 4, 5].map((star) => (
+//         <input
+//           key={star}
+//           type="radio"
+//           name={`rating-${groupId}`}
+//           className="mask mask-star-2 bg-orange-400"
+//           readOnly
+//           checked={star <= roundedRating}
+//           aria-label={`${star} star rating`}
+//         />
+//       ))}
+//     </div>
+//   );
+// };
 
 export default async function DishDetailsPage({ params }: { params: { id: string } }) {
   // Fetch data for a single meal from Supabase using the ID from the URL

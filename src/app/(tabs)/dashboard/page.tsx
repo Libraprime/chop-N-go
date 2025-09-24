@@ -33,23 +33,23 @@ interface Meal {
 }
 
 // Reusable StarRating component with a unique group identifier
-const StarRating = ({ rating, groupId }: { rating: number; groupId: string }) => {
-  return (
-    <div className="rating rating-xs">
-      {[1, 2, 3, 4, 5].map((star) => (
-        <input
-          key={star}
-          type="radio"
-          name={`rating-${groupId}`}
-          className="mask mask-star-2 bg-orange-400"
-          readOnly
-          checked={star <= rating}
-          aria-label={`${star} star rating`}
-        />
-      ))}
-    </div>
-  );
-};
+// const StarRating = ({ rating, groupId }: { rating: number; groupId: string }) => {
+//   return (
+//     <div className="rating rating-xs">
+//       {[1, 2, 3, 4, 5].map((star) => (
+//         <input
+//           key={star}
+//           type="radio"
+//           name={`rating-${groupId}`}
+//           className="mask mask-star-2 bg-orange-400"
+//           readOnly
+//           checked={star <= rating}
+//           aria-label={`${star} star rating`}
+//         />
+//       ))}
+//     </div>
+//   );
+// };
 
 const supabase = await createClient(); // <-- You need to get the consumer-side client here
 
@@ -107,8 +107,12 @@ const Dashboard = () => {
         if (data) {
           setMeals(data as Meal[]);
         }
-      } catch (err: any) {
-        console.error('Error fetching meals:', err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error('Error fetching meals:', err.message);
+        } else {
+          console.error('Error fetching meals:', err);
+        }
         setError('Failed to fetch meals. Please try again later.');
       } finally {
         setLoading(false);

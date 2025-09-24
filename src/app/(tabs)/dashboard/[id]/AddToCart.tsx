@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-// Import the toast library
 import toast from 'react-hot-toast'; 
 import { useCart } from '../../../context/CartContext';
 import { Meal } from './page';
@@ -65,7 +64,7 @@ export default function AddToCartSection({ meal }: AddToCartSectionProps) {
       <div className="mt-6">
         <h3 className="text-xl font-semibold mb-2">How to Order</h3>
         <p>
-          You can add this meal to your cart or purchase directly. To place your order, click the 'purchase this item' button below. You will be redirected to the checkout page where you can provide your delivery details and payment information.
+          You can add this meal to your cart or purchase directly. To place your order, click the &apos;purchase this item&apos; button below. You will be redirected to the checkout page where you can provide your delivery details and payment information.
         </p>
         <div className='flex justify-between mt-10'>
           <div className="flex items-center space-x-2">

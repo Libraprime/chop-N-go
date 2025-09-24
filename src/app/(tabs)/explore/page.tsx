@@ -6,7 +6,6 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import SpecialNav from '@/components/Navigation';
 import Link from 'next/link';
-// Corrected the import path to the client-side Supabase client
 import { vendorsSupabaseClient } from '@/utils/supabase/vendorsSupabaseClient';
 
 // Define the structure of the vendor data from the 'vendors' table
@@ -76,8 +75,12 @@ export default function Explore() {
         if (data) {
           setMeals(data as Meal[]);
         }
-      } catch (err: any) {
-        console.error('Error fetching meals:', err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error('Error fetching meals:', err.message);
+        } else {
+          console.error('Error fetching meals:', err);
+        }
         setError('Failed to fetch meals. Please try again later.');
       } finally {
         setLoading(false);

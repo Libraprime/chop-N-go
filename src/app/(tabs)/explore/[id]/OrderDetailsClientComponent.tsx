@@ -7,7 +7,6 @@ import { useCart } from '@/src/app/context/CartContext';
 import QuantitySelector from '@/components/QuantitySelector';
 import StarRating from '@/components/StarRating';
 import { Meal } from './page';
-import Link from 'next/link';
 
 interface OrderDetailsClientComponentProps {
   meal: Meal;
@@ -47,7 +46,7 @@ export default function OrderDetailsClientComponent({ meal }: OrderDetailsClient
       <div className="mt-6">
         <h3 className="text-xl font-semibold mb-2 text-gray-800">How to Order</h3>
         <p>
-          You can add this meal to your cart or purchase directly. To place your order, click the 'purchase this item' button below. You will be redirected to the checkout page where you can provide your delivery details and payment information.
+          You can add this meal to your cart or purchase directly. To place your order, click the &apos;purchase this item&apos; button below. You will be redirected to the checkout page where you can provide your delivery details and payment information.
         </p>
 
         <div className='my-16 align-middle flex items-center'>

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Meal, Vendor } from '@/types'; 
+import { Meal } from '@/types'; 
 import StarRating from '@/components/StarRating'; // <-- Import the StarRating component
 
 export default function FavoriteList(props: { meals: Meal[] }) {
@@ -10,7 +10,7 @@ export default function FavoriteList(props: { meals: Meal[] }) {
   if (!meals || meals.length === 0) {
     return (
       <div className="text-center text-gray-500 mt-10">
-        <p>You haven't favorited any meals yet.</p>
+        <p>You haven&apos;t favorited any meals yet.</p>
         <Link href="/dashboard" className="text-[#F36B2F] mt-2 block">
           Browse meals to find your favorites!
         </Link>

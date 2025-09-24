@@ -6,7 +6,6 @@ import { notFound } from 'next/navigation';
 import { vendorsSupabaseClient } from '@/utils/supabase/vendorsSupabaseClient';
 import Link from 'next/link';
 import OrderDetailsClientComponent from './OrderDetailsClientComponent';
-import StarRating from '@/components/StarRating';
 
 // Define the structure of the vendor data from the 'vendors' table
 export interface Vendor {
