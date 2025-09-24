@@ -50,7 +50,11 @@ export interface Meal {
 //   );
 // };
 
-export default async function DishDetailsPage({ params }: { params: { id: string } }) {
+interface PageProps {
+  params: { id: string };
+}
+
+export default async function DishDetailsPage({ params }: PageProps) {
   // Fetch data for a single meal from Supabase using the ID from the URL
   const { data: meal, error } = await vendorsSupabaseClient
     .from('meals')
