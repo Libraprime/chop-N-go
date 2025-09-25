@@ -1,18 +1,16 @@
-// src/app/error/page.tsx
-'use client'
+import { Suspense } from 'react';
+import ErrorMessage from './ErrorMessage';
 
-import { useSearchParams } from 'next/navigation'
+
 
 export default function ErrorPage() {
-  const searchParams = useSearchParams()
-  const message = searchParams.get('message') || 'Something went wrong.'
-
   return (
     <div className="grid min-h-screen place-items-center p-8 sm:p-20 font-[var(--font-geist-sans)]">
-      <main className="flex flex-col gap-4 items-center text-center">
-        <h1 className="text-2xl font-semibold text-red-500">Error</h1>
-        <p className="text-base text-gray-700">{message}</p>
-      </main>
+      {/* We wrap the client component in <Suspense> so the server knows to skip
+          this part and wait for the client to render it. */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <ErrorMessage />
+      </Suspense>
     </div>
-  )
+  );
 }
