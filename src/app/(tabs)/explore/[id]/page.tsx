@@ -32,13 +32,11 @@ export interface Meal {
 
 // This is a Server Component, so it can be async and fetch data directly
 interface PageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>
 }
 
 export default async function OrderPage({ params }: PageProps) {
-  const mealId = params.id;
+  const mealId = (await params).id;
 
   // Fetch the meal data from the 'meals' table and join with the 'vendors' table
   const { data: meal, error } = await vendorsSupabaseClient
