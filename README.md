@@ -1,6 +1,6 @@
 <<<<<<< HEAD
 # chop-N-go
-A full-stack e-commerce meal ordering application built with next and BaaS(Supabase) handling the authentication, storage, cookies and other backend functions. This application is part of a three-application software (food-project-application) built by the Avane team.
+A full-stack e-commerce meal ordering application built with next and BaaS(Supabase) handling the authentication, storage, cookies and other backend functions. This application is part of a three-application software (food-project-application) built by I and the avane development team.
 =======
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
