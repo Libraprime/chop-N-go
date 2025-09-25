@@ -30,36 +30,14 @@ export interface Meal {
   vendors: Vendor | null; // This will hold the joined vendor data
 }
 
-// Reusable StarRating component with a unique group identifier
-// const StarRating = ({ rating, groupId }: { rating: number; groupId: string }) => {
-//   const roundedRating = Math.round(rating);
-//   return (
-//     <div className="rating rating-xs">
-//       {[1, 2, 3, 4, 5].map((star) => (
-//         <input
-//           key={star}
-//           type="radio"
-//           name={`rating-${groupId}`}
-//           className="mask mask-star-2 bg-orange-400"
-//           readOnly
-//           checked={star <= roundedRating}
-//           aria-label={`${star} star rating`}
-//         />
-//       ))}
-//     </div>
-//   );
-// };
+export default async function DishDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
 
-interface PageProps {
-  params: { id: string };
-}
-
-export default async function DishDetailsPage({ params }: PageProps) {
   // Fetch data for a single meal from Supabase using the ID from the URL
   const { data: meal, error } = await vendorsSupabaseClient
     .from('meals')
     .select('*, vendors(*)')
-    .eq('id', params.id)
+    .eq('id', id)
     .single();
 
   // If there's an error or no data, show the not found page
@@ -71,22 +49,34 @@ export default async function DishDetailsPage({ params }: PageProps) {
   const vendor = meal.vendors;
 
   // Validate image URLs to prevent errors
-  const hasValidImageSrc = typeof meal.photo_url === 'string' && (meal.photo_url.startsWith('http://') || meal.photo_url.startsWith('https://'));
-  const hasValidLogo = vendor && typeof vendor.logo_url === 'string' && (vendor.logo_url.startsWith('http://') || vendor.logo_url.startsWith('https://'));
+  const hasValidImageSrc =
+    typeof meal.photo_url === 'string' &&
+    (meal.photo_url.startsWith('http://') || meal.photo_url.startsWith('https://'));
+
+  const hasValidLogo =
+    vendor &&
+    typeof vendor.logo_url === 'string' &&
+    (vendor.logo_url.startsWith('http://') || vendor.logo_url.startsWith('https://'));
 
   return (
     <section className="p-4">
       <Header />
       <SpecialNav />
-      
+
       <div className="container mx-auto p-4">
-        <div className='flex justify-between'>
+        <div className="flex justify-between">
           {hasValidLogo ? (
-            <Image src={vendor.logo_url} alt={vendor.name || 'Vendor logo'} width={50} height={50} className="rounded-full object-cover" />
+            <Image
+              src={vendor.logo_url}
+              alt={vendor.name || 'Vendor logo'}
+              width={50}
+              height={50}
+              className="rounded-full object-cover"
+            />
           ) : (
             <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-500">?</div>
           )}
-          <p className='text-xl'>{vendor?.name || 'Unknown Vendor'}</p>
+          <p className="text-xl">{vendor?.name || 'Unknown Vendor'}</p>
         </div>
 
         <h1 className="text-3xl font-bold text-center mb-6">{meal.title}</h1>
@@ -102,10 +92,13 @@ export default async function DishDetailsPage({ params }: PageProps) {
                 priority
               />
             ) : (
-              <div className="w-full h-96 bg-gray-200 flex items-center justify-center text-gray-500 rounded-lg shadow-md">No Image</div>
+              <div className="w-full h-96 bg-gray-200 flex items-center justify-center text-gray-500 rounded-lg shadow-md">
+                No Image
+              </div>
             )}
           </div>
-          {/* We now use the Client Component to render the interactive section */}
+
+          {/* Client Component for interactivity */}
           <AddToCartSection meal={meal as Meal} />
         </div>
       </div>

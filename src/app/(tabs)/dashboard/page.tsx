@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { createClient } from '@/utils/supabase/client'; 
 import { vendorsSupabaseClient } from '@/utils/supabase/vendorsSupabaseClient';
 
-// Define the structure of the vendor data from the 'vendors' table
 interface Vendor {
   id: string;
   name: string;
@@ -17,7 +16,6 @@ interface Vendor {
   rating: number;
 }
 
-// Define the structure of the meal data fetched from Supabase, including the nested vendor data
 interface Meal {
   id: string;
   vendor_id: string;
@@ -29,129 +27,130 @@ interface Meal {
   price: number;
   category: string | null;
   total_orders: number;
-  vendors: Vendor | null; // This will hold the joined vendor data
+  vendors: Vendor | null;
 }
 
-// Reusable StarRating component with a unique group identifier
-// const StarRating = ({ rating, groupId }: { rating: number; groupId: string }) => {
-//   return (
-//     <div className="rating rating-xs">
-//       {[1, 2, 3, 4, 5].map((star) => (
-//         <input
-//           key={star}
-//           type="radio"
-//           name={`rating-${groupId}`}
-//           className="mask mask-star-2 bg-orange-400"
-//           readOnly
-//           checked={star <= rating}
-//           aria-label={`${star} star rating`}
-//         />
-//       ))}
-//     </div>
-//   );
-// };
-
-const supabase = await createClient(); // <-- You need to get the consumer-side client here
-
-const handleFavorite = async (mealId: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user) {
-      alert('You must be logged in to favorite a meal.');
-      return;
-    }
-
-    try {
-      const { error } = await supabase
-          .from('favorites')
-          .insert([
-              { user_id: user.id, meal_id: mealId }
-          ]);
-
-      if (error) {
-          if (error.code === '23505') { // This is the unique constraint error code
-            alert('This meal is already in your favorites!');
-          } else {
-            throw new Error(error.message);
-          }
-        } else {
-          alert('Meal added to favorites!');
-        }
-
-  } catch (err: unknown) {
-      if (err instanceof Error) {
-        console.error('Error adding to favorites:', err.message);
-      } else {
-        console.error('Error adding to favorites:', err);
-      }
-      alert('Failed to add meal to favorites. Please try again.');
-  }
-};
+const supabase = createClient();
 
 const Dashboard = () => {
   const [meals, setMeals] = useState<Meal[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [favorites, setFavorites] = useState<Set<string>>(new Set()); // store favorited meal IDs
 
-  // Use useEffect to fetch data from Supabase when the component mounts
+  // Fetch meals
   useEffect(() => {
     const fetchMeals = async () => {
       try {
         setLoading(true);
-        // Fetch data from the 'meals' table, join with 'vendors', and order by 'total_orders' descending
         const { data, error } = await vendorsSupabaseClient
           .from('meals')
           .select('*, vendors(*)')
           .order('total_orders', { ascending: false });
 
-        if (error) {
-          throw new Error(error.message);
-        }
-
-        if (data) {
-          setMeals(data as Meal[]);
-        }
+        if (error) throw new Error(error.message);
+        if (data) setMeals(data as Meal[]);
       } catch (err: unknown) {
-        if (err instanceof Error) {
-          console.error('Error fetching meals:', err.message);
-        } else {
-          console.error('Error fetching meals:', err);
-        }
-        setError('Failed to fetch meals. Please try again later.');
+        setError(err instanceof Error ? err.message : 'Failed to fetch meals.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchMeals();
-  }, []); // The empty dependency array ensures this effect runs only once on mount
+  }, []);
 
-  // Filter the meals based on the search term
+  // Fetch user favorites once
+  useEffect(() => {
+    const fetchFavorites = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data, error } = await supabase
+        .from('favorites')
+        .select('meal_id')
+        .eq('user_id', user.id);
+
+      if (!error && data) {
+        setFavorites(new Set(data.map(fav => fav.meal_id)));
+      }
+    };
+
+    fetchFavorites();
+  }, []);
+
+  // Toggle favorite
+  const handleFavorite = async (mealId: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      alert('You must be logged in to favorite a meal.');
+      return;
+    }
+
+    try {
+      if (favorites.has(mealId)) {
+        // Remove from favorites
+        const { error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('meal_id', mealId);
+
+        if (error) throw new Error(error.message);
+
+        setFavorites(prev => {
+          const updated = new Set(prev);
+          updated.delete(mealId);
+          return updated;
+        });
+
+        alert('Meal removed from favorites.');
+      } else {
+        // Add to favorites
+        const { error } = await supabase
+          .from('favorites')
+          .upsert(
+            { user_id: user.id, meal_id: mealId },
+            { onConflict: 'user_id,meal_id' }
+          );
+
+        if (error) throw new Error(error.message);
+
+        setFavorites(prev => new Set(prev).add(mealId));
+        alert('Meal added to favorites!');
+      }
+    } catch (err: unknown) {
+      console.error('Favorite toggle error:', err);
+      alert('Failed to update favorites. Please try again.');
+    }
+  };
+
+  // Filter meals
   const filteredMeals = meals.filter(meal =>
     meal.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   return (
     <section className="p-4">
       <Header />
-      
       <SpecialNav />
 
       <label htmlFor="search" className="sr-only">Search meals</label>
       <input
         type="search"
-        name="search"
         id="search"
         className="m-5 mx-10 p-2 border border-gray-300 rounded"
         placeholder="Search meals..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      
+
       <ul className="list rounded-box shadow-md">
-        <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">Most ordered food this week</li>
-        
+        <li className="p-4 pb-2 text-xs opacity-60 tracking-wide">
+          Most ordered food this week
+        </li>
+
         {loading ? (
           <li className="p-4 text-center text-gray-500">Loading popular meals...</li>
         ) : error ? (
@@ -159,7 +158,9 @@ const Dashboard = () => {
         ) : filteredMeals.length > 0 ? (
           filteredMeals.map(meal => {
             const vendor = meal.vendors;
-            const hasValidImageSrc = typeof meal.photo_url === 'string' && (meal.photo_url.startsWith('http://') || meal.photo_url.startsWith('https://'));
+            const hasValidImageSrc = meal.photo_url?.startsWith('http');
+
+            const isFavorited = favorites.has(meal.id);
 
             return (
               <li key={meal.id} className="list-row">
@@ -167,8 +168,8 @@ const Dashboard = () => {
                   {hasValidImageSrc ? (
                     <Image
                       className="size-10 rounded-box object-cover" 
-                      src={meal.photo_url as string} 
-                      alt={meal.title || 'Meal image'} 
+                      src={meal.photo_url!} 
+                      alt={`${meal.title} from ${vendor?.name ?? 'Unknown Vendor'}`} 
                       width={40}
                       height={40}
                     />
@@ -183,21 +184,35 @@ const Dashboard = () => {
                   <div className="text-xs uppercase font-semibold opacity-60">{meal.title}</div>
                 </div>
                 <p className="list-col-wrap text-xs">{meal.description}</p>
+
                 <Link href={`/dashboard/${meal.id}`} className="btn btn-square btn-ghost" aria-label="View dish details">
                   <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M6 3L20 12 6 21 6 3z"></path></g></svg>
                 </Link>
+
                 <button
                   className="btn btn-square btn-ghost"
-                  aria-label="Add to favorites"
-                  onClick={() => handleFavorite(meal.id)} // <-- Added this onClick handler
+                  aria-label={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+                  onClick={() => handleFavorite(meal.id)}
                 >
-                  <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"></path></g></svg>
+                  {isFavorited ? (
+                    // Filled heart
+                    <svg className="size-[1.2em] text-red-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5A5.5 5.5 0 0 1 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3A5.5 5.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                  ) : (
+                    // Outline heart
+                    <svg className="size-[1.2em]" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                    </svg>
+                  )}
                 </button>
               </li>
             );
           })
         ) : (
-          <li className="p-4 text-center text-gray-500">No popular meals found.</li>
+          <li className="p-4 text-center text-gray-500">
+            {searchTerm ? 'No meals match your search.' : 'No popular meals available.'}
+          </li>
         )}
       </ul>
       <Footer />
